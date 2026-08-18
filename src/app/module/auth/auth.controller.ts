@@ -5,36 +5,20 @@ import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/sendResponse";
 import type { IRequestUser } from "./auth.interface";
 import { AuthService } from "./auth.service";
-import { z } from "zod";
 
-const patientRegistrationZodSchema = z.object({
-  name: z.string().min(3).max(100),
-  email: z.email(),
-  password: z
-    .string()
-    .min(8, "Password must be at least 8 characters long")
-    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-    .regex(/[a-z]/, "Password must contain at least one lowercase letter")
-    .regex(/[0-9]/, "Password must contain at least one number")
-    .regex(/[\W_]/, "Password must contain at least one special character")
-    .regex(
-      /[^A-Za-z0-9]/,
-      "Password must contain at least one special character",
-    ),
-  patient: z
-    .object({
-      contactNumber: z.string().optional(),
-    })
-    .optional(),
-});
+// import { patientValidation } from "./auth.validation";
+
+
 
 const registerPatient = catchAsync(async (req: Request, res: Response) => {
-  const payload = patientRegistrationZodSchema.safeParse(req.body);
+  // const payload = patientValidation.patientRegistrationZodSchema.safeParse(req.body);
 
-  if (!payload.success) {
-    throw new Error(`Validation failed: ${payload.error.message}`);
-  }
-  const result = await AuthService.registerPatient(payload.data as any);
+  // if (!payload.success) {
+  //   throw new Error(`Validation failed: ${payload.error.message}`);
+  // }
+
+  const payload = req.body;
+  const result = await AuthService.registerPatient(payload);
 
   const { accessToken, refreshToken, user, patient } = result;
 
@@ -169,6 +153,33 @@ const googleLogin = catchAsync(async (req: Request, res: Response) => {
     },
   });
 });
+const forgotPassword = catchAsync(async (req: Request, res: Response) => {
+  const payload = req.body;
+  await AuthService.forgotPassword(payload);
+
+  
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: `OTP sent to email : ${payload.email}`,
+    data: null,
+  });
+});
+const resetPassword = catchAsync(async (req: Request, res: Response) => {
+  const payload = req.body;
+
+  await AuthService.resetPassword(payload);
+
+  
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: `password change successfully`,
+    data: null,
+  });
+});
 
 export const AuthController = {
   registerPatient,
@@ -176,4 +187,6 @@ export const AuthController = {
   getMe,
   refreshToken,
   googleLogin,
+  forgotPassword,
+  resetPassword,
 };

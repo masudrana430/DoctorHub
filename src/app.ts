@@ -1,3 +1,6 @@
+/** biome-ignore-all lint/style/useImportType: <explanation> */
+/** biome-ignore-all assist/source/organizeImports: <explanation> */
+/** biome-ignore-all lint/correctness/noUnusedImports: <explanation> */
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import express, {
@@ -12,6 +15,8 @@ import { globalErrorHandler } from "./app/middleware/globalErrorHandler";
 import { notFound } from "./app/middleware/notFound";
 import { AuthRoutes } from "./app/module/auth/auth.route";
 import z, { email } from "zod";
+import { redisClient } from "./app/lib/redis";
+import crypto from "crypto"
 
 const app: Application = express();
 
@@ -31,36 +36,27 @@ app.use(cookieParser());
 
 app.use("/api/v1/auth", AuthRoutes);
 
-app.post("/zod", async (req: Request, res: Response , next: NextFunction) => {
+app.get("/test", async (req: Request, res: Response , next: NextFunction) => {
   try {
-    const UserZodSchema = z.object({
-      name: z.string(),
-	  email: z.string(),
-      age: z.number().optional(),
-      isVerified: z.boolean().optional(),
-      books: z.array(z.string()).optional(),
-    });
 
-    const payload = req.body;
+    
+    
+    // await redisClient.set("forgot-password-otp:patient1@gmail.com", "12345", {
+    //   expiration: {
+    //      type : "EX",
+    //      value : 60
+    //   }
+    // })
 
-    const result = UserZodSchema.safeParse(payload);
-	// console.log("Parsed result:", result);
-
-	if(!result.success){
-		console.error("Validation failed:", result.error);
-	}
-	if (result.success) {
-		console.log("Validation succeeded:", result.data);
-	}
-
+    
 
     res.status(httpStatus.OK).json({
       success: true,
       message: "Welcome to PH Healthcare System Backend",
-	  data: result,
+	  data: null,
     });
   } catch (error) {
-	console.error("Error in /zod route:", error);
+	console.error("Error in /test route:", error);
     next(error);
   }
 });
