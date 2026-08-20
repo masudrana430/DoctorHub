@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta
+		name="viewport"
+		content="width=device-width, initial-scale=1.0"
+	/>
+	<title>Welcome to DoctorHub</title>
+</head>
+
+<body
+	style="
+		margin: 0;
+		padding: 0;
+		background-color: #f3f7fb;
+		font-family: Arial, Helvetica, sans-serif;
+		color: #172033;
+	"
+>
+	<table
+		role="presentation"
+		width="100%"
+		cellspacing="0"
+		cellpadding="0"
+		border="0"
+		style="
+			width: 100%;
+			background-color: #f3f7fb;
+			padding: 40px 16px;
+		"
+	>
+		<tr>
+			<td align="center">
+
+				<table
+					role="presentation"
+					width="600"
+					cellspacing="0"
+					cellpadding="0"
+					border="0"
+					style="
+						width: 100%;
+						max-width: 600px;
+						background-color: #ffffff;
+						border-radius: 20px;
+						overflow: hidden;
+						box-shadow: 0 14px 40px rgba(15, 51, 92, 0.08);
+					"
+				>
+
+					<!-- Header -->
+					<tr>
+						<td
+							style="
+								background-color: #0f3d6e;
+								padding: 36px 40px;
+								text-align: center;
+							"
+						>
+							<div
+								style="
+									font-size: 30px;
+									font-weight: 700;
+									letter-spacing: -0.5px;
+									color: #ffffff;
+								"
+							>
+								Doctor<span style="color: #67e8f9;">Hub</span>
+							</div>
+
+							<p
+								style="
+									margin: 8px 0 0;
+									font-size: 14px;
+									line-height: 22px;
+									color: #c7d9ec;
+								"
+							>
+								Your trusted digital healthcare platform
+							</p>
+						</td>
+					</tr>
+
+					<!-- Welcome -->
+					<tr>
+						<td style="padding: 42px 40px 20px;">
+
+							<p
+								style="
+									margin: 0 0 12px;
+									font-size: 15px;
+									color: #6b7c93;
+								"
+							>
+								Hello <strong><%= name %></strong>,
+							</p>
+
+							<h1
+								style="
+									margin: 0 0 16px;
+									font-size: 28px;
+									line-height: 36px;
+									font-weight: 700;
+									color: #102a43;
+								"
+							>
+								Welcome to DoctorHub 🎉
+							</h1>
+
+							<p
+								style="
+									margin: 0;
+									font-size: 16px;
+									line-height: 26px;
+									color: #52667a;
+								"
+							>
+								Your email has been successfully verified and
+								your DoctorHub patient account is now active.
+								We're happy to have you with us.
+							</p>
+
+						</td>
+					</tr>
+
+					<!-- Verified Box -->
+					<tr>
+						<td style="padding: 12px 40px 28px;">
+
+							<table
+								role="presentation"
+								width="100%"
+								cellspacing="0"
+								cellpadding="0"
+								border="0"
+								style="
+									background-color: #ecfdf5;
+									border: 1px solid #a7f3d0;
+									border-radius: 14px;
+								"
+							>
+								<tr>
+									<td
+										align="center"
+										style="padding: 28px 20px;"
+									>
+										<div
+											style="
+												width: 54px;
+												height: 54px;
+												line-height: 54px;
+												margin: 0 auto 14px;
+												background-color: #059669;
+												border-radius: 50%;
+												color: #ffffff;
+												font-size: 28px;
+												font-weight: 700;
+												text-align: center;
+											"
+										>
+											✓
+										</div>
+
+										<p
+											style="
+												margin: 0 0 7px;
+												font-size: 18px;
+												font-weight: 700;
+												color: #065f46;
+											"
+										>
+											Account verified successfully
+										</p>
+
+										<p
+											style="
+												margin: 0;
+												font-size: 14px;
+												line-height: 22px;
+												color: #047857;
+											"
+										>
+											Your DoctorHub account is ready to use.
+										</p>
+									</td>
+								</tr>
+							</table>
+
+						</td>
+					</tr>
+
+					<!-- Features -->
+					<tr>
+						<td style="padding: 0 40px 30px;">
+
+							<p
+								style="
+									margin: 0 0 16px;
+									font-size: 17px;
+									font-weight: 700;
+									color: #17324d;
+								"
+							>
+								What you can do with DoctorHub
+							</p>
+
+							<table
+								role="presentation"
+								width="100%"
+								cellspacing="0"
+								cellpadding="0"
+								border="0"
+							>
+								<tr>
+									<td
+										style="
+											padding: 14px 16px;
+											background-color: #f8fafc;
+											border-radius: 10px;
+										"
+									>
+										<p
+											style="
+												margin: 0;
+												font-size: 14px;
+												line-height: 23px;
+												color: #52667a;
+											"
+										>
+											👨‍⚕️ <strong>Find doctors</strong>
+											and explore available healthcare professionals.
+										</p>
+									</td>
+								</tr>
+
+								<tr>
+									<td style="height: 10px;"></td>
+								</tr>
+
+								<tr>
+									<td
+										style="
+											padding: 14px 16px;
+											background-color: #f8fafc;
+											border-radius: 10px;
+										"
+									>
+										<p
+											style="
+												margin: 0;
+												font-size: 14px;
+												line-height: 23px;
+												color: #52667a;
+											"
+										>
+											📅 <strong>Book appointments</strong>
+											and manage your healthcare schedule.
+										</p>
+									</td>
+								</tr>
+
+								<tr>
+									<td style="height: 10px;"></td>
+								</tr>
+
+								<tr>
+									<td
+										style="
+											padding: 14px 16px;
+											background-color: #f8fafc;
+											border-radius: 10px;
+										"
+									>
+										<p
+											style="
+												margin: 0;
+												font-size: 14px;
+												line-height: 23px;
+												color: #52667a;
+											"
+										>
+											🩺 <strong>Manage your care</strong>
+											through a secure and convenient digital experience.
+										</p>
+									</td>
+								</tr>
+							</table>
+
+						</td>
+					</tr>
+
+					<!-- Security -->
+					<tr>
+						<td style="padding: 0 40px 36px;">
+
+							<table
+								role="presentation"
+								width="100%"
+								cellspacing="0"
+								cellpadding="0"
+								border="0"
+								style="
+									background-color: #eef8ff;
+									border-left: 4px solid #0ea5e9;
+									border-radius: 8px;
+								"
+							>
+								<tr>
+									<td style="padding: 17px 18px;">
+										<p
+											style="
+												margin: 0 0 6px;
+												font-size: 14px;
+												font-weight: 700;
+												color: #17324d;
+											"
+										>
+											🔐 Keep your account secure
+										</p>
+
+										<p
+											style="
+												margin: 0;
+												font-size: 13px;
+												line-height: 21px;
+												color: #60758a;
+											"
+										>
+											Never share your password or verification
+											codes with anyone. DoctorHub will never ask
+											you for your password by email or phone.
+										</p>
+									</td>
+								</tr>
+							</table>
+
+						</td>
+					</tr>
+
+					<!-- Closing -->
+					<tr>
+						<td style="padding: 0 40px 40px;">
+							<p
+								style="
+									margin: 0;
+									font-size: 14px;
+									line-height: 23px;
+									color: #6b7c93;
+								"
+							>
+								We look forward to helping make your healthcare
+								experience simpler and more accessible.
+							</p>
+
+							<p
+								style="
+									margin: 26px 0 0;
+									font-size: 14px;
+									line-height: 22px;
+									color: #52667a;
+								"
+							>
+								Take care,<br />
+								<strong style="color: #102a43;">
+									The DoctorHub Team
+								</strong>
+							</p>
+						</td>
+					</tr>
+
+					<!-- Footer -->
+					<tr>
+						<td
+							style="
+								background-color: #f8fafc;
+								border-top: 1px solid #e1eaf2;
+								padding: 24px 40px;
+								text-align: center;
+							"
+						>
+							<p
+								style="
+									margin: 0 0 6px;
+									font-size: 12px;
+									color: #91a3b5;
+								"
+							>
+								This is an automated DoctorHub email.
+								Please do not reply.
+							</p>
+
+							<p
+								style="
+									margin: 0;
+									font-size: 12px;
+									color: #91a3b5;
+								"
+							>
+								© <%= year %> DoctorHub. All rights reserved.
+							</p>
+						</td>
+					</tr>
+
+				</table>
+
+				<p
+					style="
+						margin: 22px 0 0;
+						font-size: 12px;
+						color: #91a3b5;
+					"
+				>
+					Better healthcare. Better connections.
+				</p>
+
+			</td>
+		</tr>
+	</table>
+</body>
+</html>

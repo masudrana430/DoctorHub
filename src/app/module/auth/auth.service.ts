@@ -5,448 +5,707 @@ import bcrypt from "bcryptjs";
 import type { TokenPayload } from "google-auth-library";
 import type { JwtPayload, SignOptions } from "jsonwebtoken";
 import {
-	AuthProvider,
-	Role,
-	UserStatus,
+  AuthProvider,
+  Role,
+  UserStatus,
 } from "../../../generated/prisma/enums";
 import config from "../../config";
 import { googleClient } from "../../lib/googleAuth";
 import { prisma } from "../../lib/prisma";
 import { jwtUtils } from "../../utils/jwt";
 import type {
-	IForgotPasswordPayload,
-	IGoogleLoginPayload,
-	ILoginUserPayload,
-	IRegisterPatientPayload,
-	IRequestUser,
-	IResetPasswordPayload,
+  IForgotPasswordPayload,
+  IGoogleLoginPayload,
+  ILoginUserPayload,
+  IRegisterPatientPayload,
+  IRequestUser,
+  IResetPasswordPayload,
+  IVerifyEmailPayload,
 } from "./auth.interface";
 import { redisClient } from "../../lib/redis";
 import crypto from "crypto";
-
+import { transporter } from "../../lib/nodeMailer";
+import path from "path";
+import ejs from "ejs";
 
 const registerPatient = async (payload: IRegisterPatientPayload) => {
-	const { name, password, patient: patientData } = payload;
-	const email = payload.email.trim().toLowerCase();
+  const { name, password, patient: patientData } = payload;
+  const email = payload.email.trim().toLowerCase();
 
-	const isUserExists = await prisma.user.findUnique({
-		where: { email },
-	});
+  const isUserExists = await prisma.user.findUnique({
+    where: { email },
+  });
 
-	if (isUserExists) {
-		throw new Error("User with this email already exists");
-	}
+  if (isUserExists) {
+    throw new Error("User with this email already exists");
+  }
 
-	const hashedPassword = await bcrypt.hash(password, 8);
+  const hashedPassword = await bcrypt.hash(password, 8);
 
-	const createdUser = await prisma.user.create({
-		data: {
-			// name,
-			// email,
+  const expirationSeconds = 5 * 60;
+  const otpKey = `forgor-password-otp:${email}`;
+  const otpValue = crypto.randomInt(100000, 1000000).toString();
+
+  await redisClient.set(otpKey, otpValue, {
+    expiration: {
+      type: "EX",
+      value: expirationSeconds,
+    },
+  });
+
+  const patientRegistrationKey = `patient-registration-data:${email}`;
+
+  const redisUserDataPayload = {
+    name,
+    email,
+    password: hashedPassword,
+    patient: patientData,
+  };
+
+  await redisClient.set(
+    patientRegistrationKey,
+    JSON.stringify(redisUserDataPayload),
+    {
+      expiration: {
+        type: "EX",
+        value: expirationSeconds,
+      },
+    },
+  );
+
+  const tempatePath = path.join(
+    process.cwd(),
+    "src/app/templates/registration-user-otp.ejs",
+  );
+
+  const templateData = {
+    name,
+    email,
+    otp: otpValue,
+    expirationMinutes: expirationSeconds / 60,
+    year: new Date().getFullYear(),
+  };
+
+  const html = await ejs.renderFile(tempatePath, templateData);
+
+  await transporter.sendMail({
+    from: `"DoctorHub" <${config.email_sender}>`,
+    to: email,
+    subject: "Emial verification",
+    // text : `Your OTP is ${otp}`
+    // html: `<h1>Your OTP is ${otp}</h1>`
+    html,
+  });
+
+  /*
+const createdUser = await prisma.user.create({
+    data: {
+      // name,
+      // email,
       ...payload,
-			password: hashedPassword,
-			role: Role.PATIENT,
-			status: UserStatus.ACTIVE,
-			emailVerified: false,
-			patient: {
-				create: { name, email, contactNumber: patientData?.contactNumber || "" },
-			},
-		},
-		omit: { password: true },
-		include: { patient: true },
-	});
+      password: hashedPassword,
+      role: Role.PATIENT,
+      status: UserStatus.ACTIVE,
+      emailVerified: false,
+      patient: {
+        create: {
+          name,
+          email,
+          contactNumber: patientData?.contactNumber || "",
+        },
+      },
+    },
+    omit: { password: true },
+    include: { patient: true },
+  });
 
-	const { patient, ...user } = createdUser;
-	const jwtPayload = {
-		userId: user.id,
-		name: user.name,
-		email: user.email,
-		role: user.role,
-	};
+  const { patient, ...user } = createdUser;
+  const jwtPayload = {
+    userId: user.id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+  };
 
-	const accessToken = jwtUtils.createToken(
-		jwtPayload,
-		config.jwt_access_secret,
-		config.jwt_access_expires_in as SignOptions,
-	);
+  const accessToken = jwtUtils.createToken(
+    jwtPayload,
+    config.jwt_access_secret,
+    config.jwt_access_expires_in as SignOptions,
+  );
 
-	const refreshToken = jwtUtils.createToken(
-		jwtPayload,
-		config.jwt_refresh_secret,
-		config.jwt_refresh_expires_in as SignOptions,
-	);
+  const refreshToken = jwtUtils.createToken(
+    jwtPayload,
+    config.jwt_refresh_secret,
+    config.jwt_refresh_expires_in as SignOptions,
+  );
 
-	return {
-		user,
-		patient,
-		accessToken,
-		refreshToken,
-	};
+  return {
+    user,
+    patient,
+    accessToken,
+    refreshToken,
+  };
+*/
+};
+
+const verifyPatientEamil = async (payload: IVerifyEmailPayload) => {
+  const otp = payload.otp;
+  const email = payload.email.trim().toLowerCase();
+
+  const isUserExist = await prisma.user.findUnique({
+    where: { email },
+  });
+
+  if (isUserExist?.status === "BLOCKED") {
+    throw new Error("User is Blocked");
+  }
+
+  if (isUserExist?.emailVerified) {
+    throw new Error("Email ALready Verified");
+  }
+
+  if (isUserExist?.isDeleted || isUserExist?.status === "DELETED") {
+    throw new Error("User is Deleted");
+  }
+
+  const otpKey = `forgor-password-otp:${email}`;
+
+  const redisOtp = await redisClient.get(otpKey);
+
+  if (!redisOtp) {
+    throw new Error("Invalid OTP");
+  }
+
+  if (redisOtp !== otp) {
+    throw new Error("OTP Does Not Match");
+  }
+
+  await redisClient.del(otpKey);
+
+  const patientRegistrationKey = `patient-registration-data:${email}`;
+
+  const redisPatientData = await redisClient.get(patientRegistrationKey);
+
+  if (!redisPatientData) {
+    throw new Error("Patient Doesnt Exist");
+  }
+
+  const patientPayload: IRegisterPatientPayload = JSON.parse(redisPatientData);
+
+  const createdUser = await prisma.user.create({
+    data: {
+      name: patientPayload.name,
+      email: patientPayload.email,
+
+      password: patientPayload.password,
+      role: Role.PATIENT,
+      status: UserStatus.ACTIVE,
+      emailVerified: true,
+      patient: {
+        create: {
+          name: patientPayload.name,
+          email: patientPayload.email,
+          contactNumber: patientPayload?.patient?.contactNumber || "",
+        },
+      },
+    },
+    omit: { password: true },
+    include: { patient: true },
+  });
+
+  await redisClient.del(patientRegistrationKey);
+
+  const tempatePath = path.join(
+    process.cwd(),
+    "src/app/templates/patient-welcome-email.ejs",
+  );
+
+  const templateData = {
+    name: createdUser.name,
+    year: new Date().getFullYear(),
+  };
+
+  const html = await ejs.renderFile(tempatePath, templateData);
+
+  await transporter.sendMail({
+    from: `"DoctorHub" <${config.email_sender}>`,
+    to: email,
+    subject: "Walcome To DoctorHub",
+    // text : `Your OTP is ${otp}`
+    // html: `<h1>Your OTP is ${otp}</h1>`
+    html,
+  });
+
+  const { patient, ...user } = createdUser;
+  const jwtPayload = {
+    userId: user.id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+  };
+
+  const accessToken = jwtUtils.createToken(
+    jwtPayload,
+    config.jwt_access_secret,
+    config.jwt_access_expires_in as SignOptions,
+  );
+
+  const refreshToken = jwtUtils.createToken(
+    jwtPayload,
+    config.jwt_refresh_secret,
+    config.jwt_refresh_expires_in as SignOptions,
+  );
+
+  return {
+    user,
+    patient,
+    accessToken,
+    refreshToken,
+  };
 };
 
 const loginUser = async (payload: ILoginUserPayload) => {
-	const { password } = payload;
-	const email = payload.email.trim().toLowerCase();
+  const { password } = payload;
+  const email = payload.email.trim().toLowerCase();
 
-	const user = await prisma.user.findUnique({
-		where: { email },
-	});
+  const user = await prisma.user.findUnique({
+    where: { email },
+  });
 
-	if (!user) {
-		throw new Error("User not found");
-	}
+  if (!user) {
+    throw new Error("User not found");
+  }
 
-	if (user.status === UserStatus.BLOCKED) {
-		throw new Error("User is blocked");
-	}
+  if (user.status === UserStatus.BLOCKED) {
+    throw new Error("User is blocked");
+  }
 
-	if (user.isDeleted || user.status === UserStatus.DELETED) {
-		throw new Error("User is deleted");
-	}
+  if (user.isDeleted || user.status === UserStatus.DELETED) {
+    throw new Error("User is deleted");
+  }
 
-	if (user.password === null && user.googleId !== null) {
-		throw new Error(
-			"User Already Has Account Registered With Google. Try To Login With Google.",
-		);
-	}
+  if (user.password === null && user.googleId !== null) {
+    throw new Error(
+      "User Already Has Account Registered With Google. Try To Login With Google.",
+    );
+  }
 
-	const isPasswordMatched = await bcrypt.compare(
-		password,
-		user.password as string,
-	);
+  const isPasswordMatched = await bcrypt.compare(
+    password,
+    user.password as string,
+  );
 
-	if (!isPasswordMatched) {
-		throw new Error("Invalid credentials");
-	}
+  if (!isPasswordMatched) {
+    throw new Error("Invalid credentials");
+  }
 
-	const jwtPayload = {
-		userId: user.id,
-		name: user.name,
-		email: user.email,
-		role: user.role,
-	};
+  const jwtPayload = {
+    userId: user.id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+  };
 
-	const accessToken = jwtUtils.createToken(
-		jwtPayload,
-		config.jwt_access_secret,
-		config.jwt_access_expires_in as SignOptions,
-	);
+  const accessToken = jwtUtils.createToken(
+    jwtPayload,
+    config.jwt_access_secret,
+    config.jwt_access_expires_in as SignOptions,
+  );
 
-	const refreshToken = jwtUtils.createToken(
-		jwtPayload,
-		config.jwt_refresh_secret,
-		config.jwt_refresh_expires_in as SignOptions,
-	);
+  const refreshToken = jwtUtils.createToken(
+    jwtPayload,
+    config.jwt_refresh_secret,
+    config.jwt_refresh_expires_in as SignOptions,
+  );
 
-	return {
-		accessToken,
-		refreshToken,
-	};
+  return {
+    accessToken,
+    refreshToken,
+  };
 };
 
 const getMe = async (user: IRequestUser) => {
-	const isUserExists = await prisma.user.findUnique({
-		where: {
-			id: user.userId,
-		},
-		include: {
-			patient: true,
-		},
-		omit: {
-			password: true,
-		},
-	});
+  const isUserExists = await prisma.user.findUnique({
+    where: {
+      id: user.userId,
+    },
+    include: {
+      patient: true,
+    },
+    omit: {
+      password: true,
+    },
+  });
 
-	if (!isUserExists) {
-		throw new Error("User not found");
-	}
+  if (!isUserExists) {
+    throw new Error("User not found");
+  }
 
-	return isUserExists;
+  return isUserExists;
 };
 
 const refreshToken = async (token: string) => {
-	const verifiedRefreshToken = jwtUtils.verifyToken(
-		token,
-		config.jwt_refresh_secret,
-	);
+  const verifiedRefreshToken = jwtUtils.verifyToken(
+    token,
+    config.jwt_refresh_secret,
+  );
 
-	if (!verifiedRefreshToken.success || !verifiedRefreshToken.data) {
-		throw new Error(
-			config.node_env === "development"
-				? verifiedRefreshToken.error
-				: "Invalid refresh token",
-		);
-	}
+  if (!verifiedRefreshToken.success || !verifiedRefreshToken.data) {
+    throw new Error(
+      config.node_env === "development"
+        ? verifiedRefreshToken.error
+        : "Invalid refresh token",
+    );
+  }
 
-	const data = verifiedRefreshToken.data as JwtPayload;
+  const data = verifiedRefreshToken.data as JwtPayload;
 
-	const user = await prisma.user.findUnique({
-		where: { id: data.userId },
-	});
+  const user = await prisma.user.findUnique({
+    where: { id: data.userId },
+  });
 
-	if (!user || user.isDeleted || user.status !== UserStatus.ACTIVE) {
-		throw new Error("User is inactive or not found");
-	}
+  if (!user || user.isDeleted || user.status !== UserStatus.ACTIVE) {
+    throw new Error("User is inactive or not found");
+  }
 
-	const jwtPayload = {
-		userId: user.id,
-		name: user.name,
-		email: user.email,
-		role: user.role,
-	};
+  const jwtPayload = {
+    userId: user.id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+  };
 
-	const accessToken = jwtUtils.createToken(
-		jwtPayload,
-		config.jwt_access_secret,
-		config.jwt_access_expires_in as SignOptions,
-	);
+  const accessToken = jwtUtils.createToken(
+    jwtPayload,
+    config.jwt_access_secret,
+    config.jwt_access_expires_in as SignOptions,
+  );
 
-	const refreshToken = jwtUtils.createToken(
-		jwtPayload,
-		config.jwt_refresh_secret,
-		config.jwt_refresh_expires_in as SignOptions,
-	);
+  const refreshToken = jwtUtils.createToken(
+    jwtPayload,
+    config.jwt_refresh_secret,
+    config.jwt_refresh_expires_in as SignOptions,
+  );
 
-	return {
-		accessToken,
-		refreshToken,
-	};
+  return {
+    accessToken,
+    refreshToken,
+  };
 };
 
 const googleLogin = async (payload: IGoogleLoginPayload) => {
-	let googleIdTokenPayload: TokenPayload | null | undefined = null;
-	try {
-		const ticket = await googleClient.verifyIdToken({
-			idToken: payload.idToken,
-			audience: config.google_client_id,
-		});
+  let googleIdTokenPayload: TokenPayload | null | undefined = null;
+  try {
+    const ticket = await googleClient.verifyIdToken({
+      idToken: payload.idToken,
+      audience: config.google_client_id,
+    });
 
-		googleIdTokenPayload = ticket.getPayload();
-	} catch (error) {
-		console.log("Google ID Token Verification Failed", error);
-		throw new Error("Invalid Or Expired Google Id Token");
-	}
+    googleIdTokenPayload = ticket.getPayload();
+  } catch (error) {
+    console.log("Google ID Token Verification Failed", error);
+    throw new Error("Invalid Or Expired Google Id Token");
+  }
 
-	if (!googleIdTokenPayload) {
-		throw new Error("Invalid Or Expired Google Id Token");
-	}
+  if (!googleIdTokenPayload) {
+    throw new Error("Invalid Or Expired Google Id Token");
+  }
 
-	if (!googleIdTokenPayload.email) {
-		throw new Error("Google Email Not Found");
-	}
-	if (!googleIdTokenPayload.name) {
-		throw new Error("Google Email User Name Not Found");
-	}
+  if (!googleIdTokenPayload.email) {
+    throw new Error("Google Email Not Found");
+  }
+  if (!googleIdTokenPayload.name) {
+    throw new Error("Google Email User Name Not Found");
+  }
 
-	const ifPatientExistWithGoogleAuth = await prisma.user.findUnique({
-		where: {
-			email: googleIdTokenPayload.email,
-			role: Role.PATIENT,
-			googleId: googleIdTokenPayload.sub,
-		},
-	});
+  const ifPatientExistWithGoogleAuth = await prisma.user.findUnique({
+    where: {
+      email: googleIdTokenPayload.email,
+      role: Role.PATIENT,
+      googleId: googleIdTokenPayload.sub,
+    },
+  });
 
-	let user = ifPatientExistWithGoogleAuth;
+  let user = ifPatientExistWithGoogleAuth;
 
-	if (!ifPatientExistWithGoogleAuth) {
-		const ifPatientExistWithCredentials = await prisma.user.findUnique({
-			where: {
-				email: googleIdTokenPayload.email,
-				role: Role.PATIENT,
-				authProvider: AuthProvider.CREDENTIALS,
-			},
-		});
+  if (!ifPatientExistWithGoogleAuth) {
+    const ifPatientExistWithCredentials = await prisma.user.findUnique({
+      where: {
+        email: googleIdTokenPayload.email,
+        role: Role.PATIENT,
+        authProvider: AuthProvider.CREDENTIALS,
+      },
+    });
 
-		if (ifPatientExistWithCredentials) {
-			if (!ifPatientExistWithCredentials.emailVerified) {
-				throw new Error("Email Not Verified");
-			}
+    if (ifPatientExistWithCredentials) {
+      if (!ifPatientExistWithCredentials.emailVerified) {
+        throw new Error("Email Not Verified");
+      }
 
-			if (ifPatientExistWithCredentials.status === UserStatus.BLOCKED) {
-				throw new Error("User Is Blocked");
-			}
+      if (ifPatientExistWithCredentials.status === UserStatus.BLOCKED) {
+        throw new Error("User Is Blocked");
+      }
 
-			if (
-				ifPatientExistWithCredentials.isDeleted ||
-				ifPatientExistWithCredentials.status === UserStatus.DELETED
-			) {
-				throw new Error("User Is Deleted");
-			}
+      if (
+        ifPatientExistWithCredentials.isDeleted ||
+        ifPatientExistWithCredentials.status === UserStatus.DELETED
+      ) {
+        throw new Error("User Is Deleted");
+      }
 
-			user = await prisma.user.update({
-				where: {
-					id: ifPatientExistWithCredentials.id,
-				},
+      user = await prisma.user.update({
+        where: {
+          id: ifPatientExistWithCredentials.id,
+        },
 
-				data: {
-					googleId: googleIdTokenPayload.sub,
-				},
-			});
-		} else {
-			// Google Register
-			user = await prisma.user.create({
-				data: {
-					name: googleIdTokenPayload.name,
-					email: googleIdTokenPayload.email,
-					role: Role.PATIENT,
-					googleId: googleIdTokenPayload.sub,
-					authProvider: AuthProvider.GOOGLE,
-					emailVerified: true,
-					patient: {
-						create: {
-							name: googleIdTokenPayload.name,
-							email: googleIdTokenPayload.email,
-						},
-					},
-				},
-			});
-		}
-	}
+        data: {
+          googleId: googleIdTokenPayload.sub,
+        },
+      });
+    } else {
+      // Google Register
+      user = await prisma.user.create({
+        data: {
+          name: googleIdTokenPayload.name,
+          email: googleIdTokenPayload.email,
+          role: Role.PATIENT,
+          googleId: googleIdTokenPayload.sub,
+          authProvider: AuthProvider.GOOGLE,
+          emailVerified: true,
+          patient: {
+            create: {
+              name: googleIdTokenPayload.name,
+              email: googleIdTokenPayload.email,
+            },
+          },
+        },
+      });
 
-	if (!user) {
-		throw new Error("User Not Found");
-	}
+      console.log("New Google patient created:", user.email);
 
-	if (user.status === UserStatus.BLOCKED) {
-		throw new Error("User Is Blocked");
-	}
+      // --------------------------
+      // Render welcome email
+      // --------------------------
 
-	if (user.isDeleted || user.status === UserStatus.DELETED) {
-		throw new Error("User Is Deleted");
-	}
+      const templatePath = path.join(
+        process.cwd(),
+        "src/app/templates/patient-welcome-email.ejs",
+      );
 
-	const jwtPayload = {
-		userId: user.id,
-		name: user.name,
-		email: user.email,
-		role: user.role,
-	};
+      const templateData = {
+        name: user.name,
+        year: new Date().getFullYear(),
+      };
 
-	const accessToken = jwtUtils.createToken(
-		jwtPayload,
-		config.jwt_access_secret,
-		config.jwt_access_expires_in as SignOptions,
-	);
+      const html = await ejs.renderFile(templatePath, templateData);
 
-	const refreshToken = jwtUtils.createToken(
-		jwtPayload,
-		config.jwt_refresh_secret,
-		config.jwt_refresh_expires_in as SignOptions,
-	);
+      // --------------------------
+      // Send welcome email
+      // --------------------------
 
-	return {
-		accessToken,
-		refreshToken,
-	};
+      console.log("Sending welcome email to:", user.email);
+
+      await transporter.sendMail({
+        from: `"DoctorHub" <${config.email_sender}>`,
+        to: user.email,
+        subject: "Welcome to DoctorHub! Your Account is Verified",
+        html,
+      });
+
+    //   console.log("Welcome email sent:", mailInfo.messageId);
+    }
+  }
+
+  if (!user) {
+    throw new Error("User Not Found");
+  }
+
+  if (user.status === UserStatus.BLOCKED) {
+    throw new Error("User Is Blocked");
+  }
+
+  if (user.isDeleted || user.status === UserStatus.DELETED) {
+    throw new Error("User Is Deleted");
+  }
+
+  const jwtPayload = {
+    userId: user.id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+  };
+
+  const accessToken = jwtUtils.createToken(
+    jwtPayload,
+    config.jwt_access_secret,
+    config.jwt_access_expires_in as SignOptions,
+  );
+
+  const refreshToken = jwtUtils.createToken(
+    jwtPayload,
+    config.jwt_refresh_secret,
+    config.jwt_refresh_expires_in as SignOptions,
+  );
+
+  return {
+    accessToken,
+    refreshToken,
+  };
 };
 
-const forgotPassword = async (payload : IForgotPasswordPayload) => {
-	const {email} = payload;
+const forgotPassword = async (payload: IForgotPasswordPayload) => {
+  const { email } = payload;
 
-	const isUserExist = await prisma.user.findUnique({
-		where : {
-			email
-		}
-	});
+  const isUserExist = await prisma.user.findUnique({
+    where: {
+      email,
+    },
+  });
 
-	if(!isUserExist){
-		throw new Error("User Does Not Exist!")
-	};
+  if (!isUserExist) {
+    throw new Error("User Does Not Exist!");
+  }
 
-	if(isUserExist.status === "BLOCKED"){
-		throw new Error("User is Blocked")
-	}
+  if (isUserExist.status === "BLOCKED") {
+    throw new Error("User is Blocked");
+  }
 
-	if(!isUserExist.emailVerified){
-		throw new Error("User Not Verified")
-	}
+  if (!isUserExist.emailVerified) {
+    throw new Error("User Not Verified");
+  }
 
-	if(isUserExist.isDeleted || isUserExist.status === "DELETED"){
-		throw new Error("User is Deleted")
-	}
+  if (isUserExist.isDeleted || isUserExist.status === "DELETED") {
+    throw new Error("User is Deleted");
+  }
 
-	if(isUserExist.googleId && isUserExist.authProvider === "GOOGLE"){
-		throw new Error("User Has Account With Google")
-	}
+  if (isUserExist.googleId && isUserExist.authProvider === "GOOGLE") {
+    throw new Error("User Has Account With Google");
+  }
 
-	const otp = crypto.randomInt(100000, 1000000).toString();
+  const otp = crypto.randomInt(100000, 1000000).toString();
 
-	const key = `forgor-password-otp:${isUserExist.email}`
+  const key = `forgor-password-otp:${isUserExist.email}`;
 
-	const expirationSeconds = 5 * 60
+  const expirationSeconds = 5 * 60;
 
-	await redisClient.set(key, otp, {
-		expiration : {
-			type : "EX",
-			value : expirationSeconds
-		}
-	})
+  await redisClient.set(key, otp, {
+    expiration: {
+      type: "EX",
+      value: expirationSeconds,
+    },
+  });
 
-	
-}
+  const tempatePath = path.join(
+    process.cwd(),
+    "src/app/templates/forgot-password.ejs",
+  );
 
-const resetPassword = async (payload : IResetPasswordPayload) => {
-	const {email, otp, newPassword} = payload;
+  const templateData = {
+    name: isUserExist.name,
+    otp,
+    expirationMinutes: expirationSeconds / 60,
+    year: new Date().getFullYear(),
+  };
 
-	const isUserExist = await prisma.user.findUnique({
-		where : {
-			email
-		}
-	});
+  const html = await ejs.renderFile(tempatePath, templateData);
 
-	if(!isUserExist){
-		throw new Error("User Does Not Exist!")
-	};
+  await transporter.sendMail({
+    from: `"DoctorHub" <${config.email_sender}>`,
+    to: isUserExist.email,
+    subject: "Forgot Password",
+    // text : `Your OTP is ${otp}`
+    // html: `<h1>Your OTP is ${otp}</h1>`
+    html,
+  });
+};
 
-	if(isUserExist.status === "BLOCKED"){
-		throw new Error("User is Blocked")
-	}
+const resetPassword = async (payload: IResetPasswordPayload) => {
+  const { email, otp, newPassword } = payload;
 
-	if(!isUserExist.emailVerified){
-		throw new Error("User Not Verified")
-	}
+  const isUserExist = await prisma.user.findUnique({
+    where: {
+      email,
+    },
+  });
 
-	if(isUserExist.isDeleted || isUserExist.status === "DELETED"){
-		throw new Error("User is Deleted")
-	}
+  if (!isUserExist) {
+    throw new Error("User Does Not Exist!");
+  }
 
-	if(isUserExist.googleId && isUserExist.authProvider === "GOOGLE"){
-		throw new Error("User Has Account With Google")
-	}
+  if (isUserExist.status === "BLOCKED") {
+    throw new Error("User is Blocked");
+  }
 
-	const key = `forgor-password-otp:${isUserExist.email}`
+  if (!isUserExist.emailVerified) {
+    throw new Error("User Not Verified");
+  }
 
-	const redisOtp = await redisClient.get(key)
+  if (isUserExist.isDeleted || isUserExist.status === "DELETED") {
+    throw new Error("User is Deleted");
+  }
 
-	if(!redisOtp){
-		throw new Error("Invalid OTP")
-	}
+  if (isUserExist.googleId && isUserExist.authProvider === "GOOGLE") {
+    throw new Error("User Has Account With Google");
+  }
 
-	if(redisOtp !== otp){
-		throw new Error("OTP Does Not Match")
-	}
+  const key = `forgor-password-otp:${isUserExist.email}`;
 
-	const hashedNewPassword = await bcrypt.hash(newPassword, Number(config.bcrypt_salt_rounds));
+  const redisOtp = await redisClient.get(key);
 
-	await prisma.user.update({
-		where : {
-			email : isUserExist.email
-		},
-		data : {
-			password : hashedNewPassword
-		}
-	});
+  if (!redisOtp) {
+    throw new Error("Invalid OTP");
+  }
 
-	await redisClient.del([key]);
-}
+  if (redisOtp !== otp) {
+    throw new Error("OTP Does Not Match");
+  }
+
+  const hashedNewPassword = await bcrypt.hash(
+    newPassword,
+    Number(config.bcrypt_salt_rounds),
+  );
+
+  await prisma.user.update({
+    where: {
+      email: isUserExist.email,
+    },
+    data: {
+      password: hashedNewPassword,
+    },
+  });
+
+  await redisClient.del([key]);
+
+  const tempatePath = path.join(
+    process.cwd(),
+    "src/app/templates/reset-password-success.ejs",
+  );
+
+  const templateData = {
+    name: isUserExist.name,
+    email: isUserExist.email,
+    year: new Date().getFullYear(),
+  };
+
+  const html = await ejs.renderFile(tempatePath, templateData);
+
+  await transporter.sendMail({
+    from: `"DoctorHub" <${config.email_sender}>`,
+    to: isUserExist.email,
+    subject: "Password Changed",
+    // text : `Your OTP is ${otp}`
+    // html: `<h1>Your Password Is Changed</h1>`
+    html,
+  });
+};
 
 export const AuthService = {
-	registerPatient,
-	loginUser,
-	getMe,
-	refreshToken,
-	googleLogin,
-	forgotPassword,
-	resetPassword,
-
+  registerPatient,
+  verifyPatientEamil,
+  loginUser,
+  getMe,
+  refreshToken,
+  googleLogin,
+  forgotPassword,
+  resetPassword,
 };
