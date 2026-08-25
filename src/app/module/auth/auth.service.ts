@@ -91,7 +91,8 @@ const registerPatient = async (payload: IRegisterPatientPayload) => {
   await transporter.sendMail({
     from: `"DoctorHub" <${config.email_sender}>`,
     to: email,
-    subject: "Emial verification",
+   replyTo: `"DoctorHub Support" <${config.email_sender}>`,
+    subject: "Email verification",
     // text : `Your OTP is ${otp}`
     // html: `<h1>Your OTP is ${otp}</h1>`
     html,
@@ -230,7 +231,8 @@ const verifyPatientEamil = async (payload: IVerifyEmailPayload) => {
   await transporter.sendMail({
     from: `"DoctorHub" <${config.email_sender}>`,
     to: email,
-    subject: "Walcome To DoctorHub",
+    replyTo: `"DoctorHub Support" <${config.email_sender}>`,
+    subject: "Welcome To DoctorHub",
     // text : `Your OTP is ${otp}`
     // html: `<h1>Your OTP is ${otp}</h1>`
     html,
@@ -508,6 +510,7 @@ const googleLogin = async (payload: IGoogleLoginPayload) => {
       await transporter.sendMail({
         from: `"DoctorHub" <${config.email_sender}>`,
         to: user.email,
+        replyTo: `"DoctorHub Support" <${config.email_sender}>`,
         subject: "Welcome to DoctorHub! Your Account is Verified",
         html,
       });
@@ -612,6 +615,7 @@ const forgotPassword = async (payload: IForgotPasswordPayload) => {
   await transporter.sendMail({
     from: `"DoctorHub" <${config.email_sender}>`,
     to: isUserExist.email,
+    replyTo: `"DoctorHub Support" <${config.email_sender}>`,
     subject: "Forgot Password",
     // text : `Your OTP is ${otp}`
     // html: `<h1>Your OTP is ${otp}</h1>`
@@ -692,6 +696,7 @@ const resetPassword = async (payload: IResetPasswordPayload) => {
   await transporter.sendMail({
     from: `"DoctorHub" <${config.email_sender}>`,
     to: isUserExist.email,
+   replyTo: `"DoctorHub Support" <${config.email_sender}>`,
     subject: "Password Changed",
     // text : `Your OTP is ${otp}`
     // html: `<h1>Your Password Is Changed</h1>`
