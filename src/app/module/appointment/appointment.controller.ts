@@ -5,19 +5,29 @@ import { sendResponse } from "../../utils/sendResponse";
 import { AppointmentServices } from "./appointment.service";
 
 const bookAppointment = catchAsync(async (req: Request, res: Response) => {
-    const result = await AppointmentServices.bookAppointment()
-    sendResponse(res, {
-        statusCode: httpStatus.OK,
-        success: true,
-        message: "User profile fetched successfully",
-        data: result,
-    });
-});
-const bookAppointmentCallback = catchAsync(async (req: Request, res: Response) => {
-    console.log(req.query, "req.query");
-    const {executedPaymentResult, redirectUrl} =  await AppointmentServices.bookAppointmentCallback(req.query);
+  const payload = req.body;
+  const user = req.user;
 
-    console.log({executedPaymentResult}, "callback controller");
+  if (!user) {
+    throw new Error("User not found in request");
+  }
+
+  const result = await AppointmentServices.bookAppointment(payload, user);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "User profile fetched successfully",
+    data: result,
+  });
+});
+const bookAppointmentCallback = catchAsync(
+  async (req: Request, res: Response) => {
+    // console.log(req.query, "req.query");
+    const { redirectUrl } = await AppointmentServices.bookAppointmentCallback(
+      req.query,
+    );
+
+    // console.log({ executedPaymentResult }, "callback controller");
 
     res.redirect(redirectUrl);
     // sendResponse(res, {
@@ -26,9 +36,10 @@ const bookAppointmentCallback = catchAsync(async (req: Request, res: Response) =
     //     message: "User profile fetched successfully",
     //     data: result,
     // });
-});
+  },
+);
 
 export const AppointmentController = {
-    bookAppointment,
-    bookAppointmentCallback
-}
+  bookAppointment,
+  bookAppointmentCallback,
+};
