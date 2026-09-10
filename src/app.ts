@@ -14,9 +14,7 @@ import config from "./app/config";
 import { globalErrorHandler } from "./app/middleware/globalErrorHandler";
 import { notFound } from "./app/middleware/notFound";
 import { AuthRoutes } from "./app/module/auth/auth.route";
-import z, { email } from "zod";
-import { redisClient } from "./app/lib/redis";
-import crypto from "crypto";
+
 import { UserRoutes } from "./app/module/user/user.route";
 import { getBkashIdToken } from "./app/lib/bkash";
 import { AppointementRoutes } from "./app/module/appointment/appointment.route";
