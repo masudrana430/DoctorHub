@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta
+		name="viewport"
+		content="width=device-width, initial-scale=1.0"
+	/>
+	<title>Appointment Confirmed</title>
+</head>
+
+<body
+	style="
+		margin: 0;
+		padding: 0;
+		background-color: #f1f5f9;
+		font-family: Arial, Helvetica, sans-serif;
+		color: #0f172a;
+	"
+>
+	<table
+		role="presentation"
+		width="100%"
+		cellspacing="0"
+		cellpadding="0"
+		border="0"
+		style="
+			width: 100%;
+			background-color: #f1f5f9;
+			padding: 40px 16px;
+		"
+	>
+		<tr>
+			<td align="center">
+
+				<!-- MAIN CARD -->
+				<table
+					role="presentation"
+					width="620"
+					cellspacing="0"
+					cellpadding="0"
+					border="0"
+					style="
+						width: 100%;
+						max-width: 620px;
+						background-color: #ffffff;
+						border-radius: 20px;
+						overflow: hidden;
+						box-shadow: 0 16px 45px rgba(15, 23, 42, 0.08);
+					"
+				>
+
+					<!-- HEADER -->
+					<tr>
+						<td
+							style="
+								background-color: #0f3d6e;
+								padding: 38px 40px;
+								text-align: center;
+							"
+						>
+							<div
+								style="
+									font-size: 30px;
+									font-weight: 700;
+									color: #ffffff;
+									letter-spacing: -0.5px;
+								"
+							>
+								Doctor<span style="color: #67e8f9;">Hub</span>
+							</div>
+
+							<p
+								style="
+									margin: 8px 0 0;
+									font-size: 14px;
+									line-height: 22px;
+									color: #c7d9ec;
+								"
+							>
+								Your trusted digital healthcare platform
+							</p>
+						</td>
+					</tr>
+
+					<!-- SUCCESS -->
+					<tr>
+						<td
+							style="
+								padding: 40px 40px 18px;
+								text-align: center;
+							"
+						>
+							<div
+								style="
+									width: 62px;
+									height: 62px;
+									line-height: 62px;
+									margin: 0 auto 18px;
+									background-color: #059669;
+									border-radius: 50%;
+									color: #ffffff;
+									font-size: 32px;
+									font-weight: bold;
+									text-align: center;
+								"
+							>
+								✓
+							</div>
+
+							<h1
+								style="
+									margin: 0 0 12px;
+									font-size: 27px;
+									line-height: 36px;
+									color: #102a43;
+								"
+							>
+								Appointment Confirmed!
+							</h1>
+
+							<p
+								style="
+									margin: 0;
+									font-size: 15px;
+									line-height: 25px;
+									color: #64748b;
+								"
+							>
+								Hello <strong><%= patientName %></strong>,
+								your payment was successful and your
+								appointment has been confirmed.
+							</p>
+						</td>
+					</tr>
+
+					<!-- SERIAL NUMBER -->
+					<tr>
+						<td style="padding: 20px 40px 28px;">
+							<table
+								role="presentation"
+								width="100%"
+								cellspacing="0"
+								cellpadding="0"
+								border="0"
+								style="
+									background-color: #eff6ff;
+									border: 1px solid #bfdbfe;
+									border-radius: 14px;
+								"
+							>
+								<tr>
+									<td
+										align="center"
+										style="padding: 25px;"
+									>
+										<p
+											style="
+												margin: 0 0 7px;
+												font-size: 12px;
+												font-weight: 700;
+												text-transform: uppercase;
+												letter-spacing: 1.5px;
+												color: #64748b;
+											"
+										>
+											Your Serial Number
+										</p>
+
+										<div
+											style="
+												font-size: 38px;
+												line-height: 46px;
+												font-weight: 700;
+												color: #0f3d6e;
+											"
+										>
+											#<%= serialNumber %>
+										</div>
+
+										<p
+											style="
+												margin: 8px 0 0;
+												font-size: 13px;
+												color: #64748b;
+											"
+										>
+											Please be ready before your joining time.
+										</p>
+									</td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+
+					<!-- APPOINTMENT DETAILS -->
+					<tr>
+						<td style="padding: 0 40px 30px;">
+
+							<h2
+								style="
+									margin: 0 0 16px;
+									font-size: 18px;
+									color: #102a43;
+								"
+							>
+								Appointment Details
+							</h2>
+
+							<table
+								role="presentation"
+								width="100%"
+								cellspacing="0"
+								cellpadding="0"
+								border="0"
+								style="
+									border: 1px solid #e2e8f0;
+									border-radius: 12px;
+									overflow: hidden;
+								"
+							>
+								<tr>
+									<td
+										style="
+											padding: 14px 16px;
+											background-color: #f8fafc;
+											font-size: 13px;
+											color: #64748b;
+											width: 40%;
+											border-bottom: 1px solid #e2e8f0;
+										"
+									>
+										Doctor
+									</td>
+
+									<td
+										style="
+											padding: 14px 16px;
+											font-size: 14px;
+											font-weight: 600;
+											color: #1e293b;
+											border-bottom: 1px solid #e2e8f0;
+										"
+									>
+										<%= doctorName %>
+									</td>
+								</tr>
+
+								<tr>
+									<td
+										style="
+											padding: 14px 16px;
+											background-color: #f8fafc;
+											font-size: 13px;
+											color: #64748b;
+											border-bottom: 1px solid #e2e8f0;
+										"
+									>
+										Specialization
+									</td>
+
+									<td
+										style="
+											padding: 14px 16px;
+											font-size: 14px;
+											color: #1e293b;
+											border-bottom: 1px solid #e2e8f0;
+										"
+									>
+										<%= specialization %>
+									</td>
+								</tr>
+
+								<tr>
+									<td
+										style="
+											padding: 14px 16px;
+											background-color: #f8fafc;
+											font-size: 13px;
+											color: #64748b;
+											border-bottom: 1px solid #e2e8f0;
+										"
+									>
+										Appointment Date
+									</td>
+
+									<td
+										style="
+											padding: 14px 16px;
+											font-size: 14px;
+											color: #1e293b;
+											border-bottom: 1px solid #e2e8f0;
+										"
+									>
+										<%= appointmentDate %>
+									</td>
+								</tr>
+
+								<tr>
+									<td
+										style="
+											padding: 14px 16px;
+											background-color: #f8fafc;
+											font-size: 13px;
+											color: #64748b;
+										"
+									>
+										Joining Time
+									</td>
+
+									<td
+										style="
+											padding: 14px 16px;
+											font-size: 15px;
+											font-weight: 700;
+											color: #059669;
+										"
+									>
+										<%= joiningTime %>
+									</td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+
+					<!-- MEETING -->
+					<tr>
+						<td style="padding: 0 40px 30px;">
+
+							<table
+								role="presentation"
+								width="100%"
+								cellspacing="0"
+								cellpadding="0"
+								border="0"
+								style="
+									background-color: #eef8ff;
+									border: 1px solid #bae6fd;
+									border-radius: 12px;
+								"
+							>
+								<tr>
+									<td
+										align="center"
+										style="padding: 24px;"
+									>
+										<p
+											style="
+												margin: 0 0 8px;
+												font-size: 17px;
+												font-weight: 700;
+												color: #0c4a6e;
+											"
+										>
+											🎥 Online Consultation
+										</p>
+
+										<p
+											style="
+												margin: 0 0 18px;
+												font-size: 13px;
+												line-height: 21px;
+												color: #64748b;
+											"
+										>
+											Use the button below to join your
+											consultation at your assigned time.
+										</p>
+
+										<a
+											href="<%= meetingLink %>"
+											style="
+												display: inline-block;
+												background-color: #0284c7;
+												color: #ffffff;
+												text-decoration: none;
+												font-size: 14px;
+												font-weight: 700;
+												padding: 13px 25px;
+												border-radius: 8px;
+											"
+										>
+											Join Appointment
+										</a>
+									</td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+
+					<!-- PAYMENT -->
+					<tr>
+						<td style="padding: 0 40px 30px;">
+
+							<h2
+								style="
+									margin: 0 0 16px;
+									font-size: 18px;
+									color: #102a43;
+								"
+							>
+								Payment Details
+							</h2>
+
+							<table
+								role="presentation"
+								width="100%"
+								cellspacing="0"
+								cellpadding="0"
+								border="0"
+								style="
+									border: 1px solid #e2e8f0;
+									border-radius: 12px;
+								"
+							>
+								<tr>
+									<td
+										style="
+											padding: 14px 16px;
+											font-size: 13px;
+											color: #64748b;
+											border-bottom: 1px solid #e2e8f0;
+										"
+									>
+										Amount Paid
+									</td>
+
+									<td
+										align="right"
+										style="
+											padding: 14px 16px;
+											font-size: 16px;
+											font-weight: 700;
+											color: #059669;
+											border-bottom: 1px solid #e2e8f0;
+										"
+									>
+										<%= amount %> BDT
+									</td>
+								</tr>
+
+								<tr>
+									<td
+										style="
+											padding: 14px 16px;
+											font-size: 13px;
+											color: #64748b;
+											border-bottom: 1px solid #e2e8f0;
+										"
+									>
+										Payment Method
+									</td>
+
+									<td
+										align="right"
+										style="
+											padding: 14px 16px;
+											font-size: 14px;
+											font-weight: 600;
+											color: #1e293b;
+											border-bottom: 1px solid #e2e8f0;
+										"
+									>
+										bKash
+									</td>
+								</tr>
+
+								<tr>
+									<td
+										style="
+											padding: 14px 16px;
+											font-size: 13px;
+											color: #64748b;
+											border-bottom: 1px solid #e2e8f0;
+										"
+									>
+										Transaction ID
+									</td>
+
+									<td
+										align="right"
+										style="
+											padding: 14px 16px;
+											font-family: monospace;
+											font-size: 13px;
+											color: #1e293b;
+											border-bottom: 1px solid #e2e8f0;
+										"
+									>
+										<%= transactionId %>
+									</td>
+								</tr>
+
+								<tr>
+									<td
+										style="
+											padding: 14px 16px;
+											font-size: 13px;
+											color: #64748b;
+										"
+									>
+										Paid At
+									</td>
+
+									<td
+										align="right"
+										style="
+											padding: 14px 16px;
+											font-size: 13px;
+											color: #1e293b;
+										"
+									>
+										<%= paidAt %>
+									</td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+
+					<!-- PDF NOTICE -->
+					<tr>
+						<td style="padding: 0 40px 30px;">
+
+							<table
+								role="presentation"
+								width="100%"
+								cellspacing="0"
+								cellpadding="0"
+								border="0"
+								style="
+									background-color: #f8fafc;
+									border-left: 4px solid #0f3d6e;
+									border-radius: 8px;
+								"
+							>
+								<tr>
+									<td style="padding: 17px 18px;">
+										<p
+											style="
+												margin: 0 0 5px;
+												font-size: 14px;
+												font-weight: 700;
+												color: #1e293b;
+											"
+										>
+											📎 Appointment Invoice Attached
+										</p>
+
+										<p
+											style="
+												margin: 0;
+												font-size: 13px;
+												line-height: 21px;
+												color: #64748b;
+											"
+										>
+											Your official appointment and payment
+											invoice is attached to this email as a
+											PDF. Please keep it for your records.
+										</p>
+									</td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+
+					<!-- REMINDER -->
+					<tr>
+						<td style="padding: 0 40px 36px;">
+
+							<p
+								style="
+									margin: 0 0 8px;
+									font-size: 14px;
+									font-weight: 700;
+									color: #102a43;
+								"
+							>
+								Before your appointment
+							</p>
+
+							<p
+								style="
+									margin: 0;
+									font-size: 13px;
+									line-height: 22px;
+									color: #64748b;
+								"
+							>
+								Please join a few minutes early and make sure
+								your internet connection, camera, and microphone
+								are working properly.
+							</p>
+						</td>
+					</tr>
+
+					<!-- FOOTER -->
+					<tr>
+						<td
+							style="
+								background-color: #f8fafc;
+								border-top: 1px solid #e2e8f0;
+								padding: 25px 40px;
+								text-align: center;
+							"
+						>
+							<p
+								style="
+									margin: 0 0 6px;
+									font-size: 12px;
+									color: #94a3b8;
+								"
+							>
+								Need help? Reply to this email and
+								DoctorHub Support will assist you.
+							</p>
+
+							<p
+								style="
+									margin: 0;
+									font-size: 12px;
+									color: #94a3b8;
+								"
+							>
+								© <%= year %> DoctorHub.
+								All rights reserved.
+							</p>
+						</td>
+					</tr>
+
+				</table>
+
+			</td>
+		</tr>
+	</table>
+</body>
+</html>

@@ -2,25 +2,26 @@
 /** biome-ignore-all lint/style/useImportType: <explanation> */
 // biome-ignore assist/source/organizeImports: <explanation>
 import { Request, Response } from "express";
-import { catchAsync } from "../../utils/catchAsync";
-import { AuthService } from "../auth/auth.service";
-import { sendResponse } from "../../utils/sendResponse";
 import httpStatus from "http-status";
+import { AppError } from "../../utils/AppError";
+import { catchAsync } from "../../utils/catchAsync";
+import { sendResponse } from "../../utils/sendResponse";
 import { UserServices } from "./user.service";
 
 const uploadProfileImage = catchAsync(async (req: Request, res: Response) => {
- 
-//   console.log(req.file, "req.file")
+  //   console.log(req.file, "req.file")
 
- if (!req.file) {
-   throw new Error("No file uploaded");
- }
+  if (!req.file) {
+    throw new AppError(httpStatus.BAD_REQUEST, "No file uploaded");
+  }
 
- const userId = req.user?.userId;
+  const userId = req.user?.userId;
 
- 
-  const result = await UserServices.uploadProfileImage(req.file?.buffer, userId!);
-  
+  const result = await UserServices.uploadProfileImage(
+    req.file?.buffer,
+    userId!,
+  );
+
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

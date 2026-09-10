@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta
+		name="viewport"
+		content="width=device-width, initial-scale=1.0"
+	/>
+	<title>Your Prescription</title>
+</head>
+
+<body
+	style="
+		margin: 0;
+		padding: 0;
+		background-color: #f1f5f9;
+		font-family: Arial, Helvetica, sans-serif;
+		color: #0f172a;
+	"
+>
+	<table
+		role="presentation"
+		width="100%"
+		cellspacing="0"
+		cellpadding="0"
+		border="0"
+		style="
+			width: 100%;
+			background-color: #f1f5f9;
+			padding: 40px 16px;
+		"
+	>
+		<tr>
+			<td align="center">
+
+				<table
+					role="presentation"
+					width="620"
+					cellspacing="0"
+					cellpadding="0"
+					border="0"
+					style="
+						width: 100%;
+						max-width: 620px;
+						background-color: #ffffff;
+						border-radius: 18px;
+						overflow: hidden;
+						box-shadow: 0 16px 45px rgba(15, 23, 42, 0.08);
+					"
+				>
+
+					<!-- Header -->
+					<tr>
+						<td
+							style="
+								padding: 36px 40px;
+								background-color: #0f3d6e;
+								text-align: center;
+							"
+						>
+							<div
+								style="
+									margin: 0;
+									font-size: 30px;
+									font-weight: 700;
+									color: #ffffff;
+									letter-spacing: -0.5px;
+								"
+							>
+								Doctor<span style="color: #67e8f9;">Hub</span>
+							</div>
+
+							<p
+								style="
+									margin: 8px 0 0;
+									font-size: 14px;
+									line-height: 22px;
+									color: #cbd5e1;
+								"
+							>
+								Your trusted digital healthcare platform
+							</p>
+						</td>
+					</tr>
+
+					<!-- Main message -->
+					<tr>
+						<td
+							style="
+								padding: 40px 40px 20px;
+								text-align: center;
+							"
+						>
+							<div
+								style="
+									width: 64px;
+									height: 64px;
+									line-height: 64px;
+									margin: 0 auto 20px;
+									border-radius: 50%;
+									background-color: #ecfdf5;
+									color: #059669;
+									font-size: 32px;
+									font-weight: 700;
+								"
+							>
+								✓
+							</div>
+
+							<h1
+								style="
+									margin: 0 0 12px;
+									font-size: 27px;
+									line-height: 36px;
+									color: #102a43;
+								"
+							>
+								Your Prescription Is Ready
+							</h1>
+
+							<p
+								style="
+									margin: 0;
+									font-size: 15px;
+									line-height: 25px;
+									color: #64748b;
+								"
+							>
+								Hello
+								<strong><%= patientName %></strong>,
+								your doctor has completed your prescription
+								following your consultation.
+							</p>
+						</td>
+					</tr>
+
+					<!-- Doctor Details -->
+					<tr>
+						<td style="padding: 20px 40px 30px;">
+							<table
+								role="presentation"
+								width="100%"
+								cellspacing="0"
+								cellpadding="0"
+								border="0"
+								style="
+									border: 1px solid #e2e8f0;
+									border-radius: 12px;
+									overflow: hidden;
+								"
+							>
+								<tr>
+									<td
+										colspan="2"
+										style="
+											padding: 16px;
+											background-color: #f8fafc;
+											font-size: 16px;
+											font-weight: 700;
+											color: #102a43;
+											border-bottom: 1px solid #e2e8f0;
+										"
+									>
+										Prescription Details
+									</td>
+								</tr>
+
+								<tr>
+									<td
+										style="
+											width: 38%;
+											padding: 14px 16px;
+											background-color: #f8fafc;
+											font-size: 13px;
+											color: #64748b;
+											border-bottom: 1px solid #e2e8f0;
+										"
+									>
+										Doctor
+									</td>
+
+									<td
+										style="
+											padding: 14px 16px;
+											font-size: 14px;
+											font-weight: 600;
+											color: #1e293b;
+											border-bottom: 1px solid #e2e8f0;
+										"
+									>
+										<%= doctorName %>
+									</td>
+								</tr>
+
+								<tr>
+									<td
+										style="
+											padding: 14px 16px;
+											background-color: #f8fafc;
+											font-size: 13px;
+											color: #64748b;
+											border-bottom: 1px solid #e2e8f0;
+										"
+									>
+										Specialization
+									</td>
+
+									<td
+										style="
+											padding: 14px 16px;
+											font-size: 14px;
+											color: #1e293b;
+											border-bottom: 1px solid #e2e8f0;
+										"
+									>
+										<%= specialization %>
+									</td>
+								</tr>
+
+								<tr>
+									<td
+										style="
+											padding: 14px 16px;
+											background-color: #f8fafc;
+											font-size: 13px;
+											color: #64748b;
+											border-bottom: 1px solid #e2e8f0;
+										"
+									>
+										Patient
+									</td>
+
+									<td
+										style="
+											padding: 14px 16px;
+											font-size: 14px;
+											color: #1e293b;
+											border-bottom: 1px solid #e2e8f0;
+										"
+									>
+										<%= patientName %>
+									</td>
+								</tr>
+
+								<tr>
+									<td
+										style="
+											padding: 14px 16px;
+											background-color: #f8fafc;
+											font-size: 13px;
+											color: #64748b;
+										"
+									>
+										Prescription Date
+									</td>
+
+									<td
+										style="
+											padding: 14px 16px;
+											font-size: 14px;
+											color: #1e293b;
+										"
+									>
+										<%= prescriptionDate %>
+									</td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+
+					<!-- PDF Attachment -->
+					<tr>
+						<td style="padding: 0 40px 30px;">
+							<table
+								role="presentation"
+								width="100%"
+								cellspacing="0"
+								cellpadding="0"
+								border="0"
+								style="
+									background-color: #eff6ff;
+									border: 1px solid #bfdbfe;
+									border-radius: 12px;
+								"
+							>
+								<tr>
+									<td
+										style="
+											padding: 22px;
+											text-align: center;
+										"
+									>
+										<div
+											style="
+												font-size: 28px;
+												margin-bottom: 10px;
+											"
+										>
+											📄
+										</div>
+
+										<p
+											style="
+												margin: 0 0 7px;
+												font-size: 16px;
+												font-weight: 700;
+												color: #1e3a5f;
+											"
+										>
+											Prescription PDF Attached
+										</p>
+
+										<p
+											style="
+												margin: 0;
+												font-size: 13px;
+												line-height: 21px;
+												color: #64748b;
+											"
+										>
+											Your complete prescription, including
+											findings, medicines, dosage, duration
+											and instructions, is attached to this
+											email.
+										</p>
+									</td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+
+					<!-- Optional Online Download -->
+					<% if (prescriptionUrl) { %>
+					<tr>
+						<td
+							style="
+								padding: 0 40px 32px;
+								text-align: center;
+							"
+						>
+							<p
+								style="
+									margin: 0 0 15px;
+									font-size: 13px;
+									color: #64748b;
+								"
+							>
+								You can also access your prescription online.
+							</p>
+
+							<a
+								href="<%= prescriptionUrl %>"
+								target="_blank"
+								style="
+									display: inline-block;
+									background-color: #0f3d6e;
+									color: #ffffff;
+									text-decoration: none;
+									font-size: 14px;
+									font-weight: 700;
+									padding: 13px 24px;
+									border-radius: 8px;
+								"
+							>
+								View Prescription
+							</a>
+						</td>
+					</tr>
+					<% } %>
+
+					<!-- Important notice -->
+					<tr>
+						<td style="padding: 0 40px 32px;">
+							<table
+								role="presentation"
+								width="100%"
+								cellspacing="0"
+								cellpadding="0"
+								border="0"
+								style="
+									background-color: #fffbeb;
+									border-left: 4px solid #f59e0b;
+									border-radius: 8px;
+								"
+							>
+								<tr>
+									<td style="padding: 18px;">
+										<p
+											style="
+												margin: 0 0 7px;
+												font-size: 14px;
+												font-weight: 700;
+												color: #92400e;
+											"
+										>
+											Important
+										</p>
+
+										<p
+											style="
+												margin: 0;
+												font-size: 13px;
+												line-height: 21px;
+												color: #78350f;
+											"
+										>
+											Please follow your doctor's instructions
+											and medicine dosage exactly as described
+											in your prescription.
+										</p>
+									</td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+
+					<!-- Support -->
+					<tr>
+						<td style="padding: 0 40px 38px;">
+							<p
+								style="
+									margin: 0;
+									font-size: 13px;
+									line-height: 22px;
+									color: #64748b;
+									text-align: center;
+								"
+							>
+								If you have questions regarding your
+								prescription or appointment, please contact
+								DoctorHub Support or schedule a follow-up
+								consultation with your doctor.
+							</p>
+						</td>
+					</tr>
+
+					<!-- Footer -->
+					<tr>
+						<td
+							style="
+								background-color: #f8fafc;
+								border-top: 1px solid #e2e8f0;
+								padding: 25px 40px;
+								text-align: center;
+							"
+						>
+							<p
+								style="
+									margin: 0 0 6px;
+									font-size: 12px;
+									color: #94a3b8;
+								"
+							>
+								Need help? Reply to this email and our
+								support team will assist you.
+							</p>
+
+							<p
+								style="
+									margin: 0;
+									font-size: 12px;
+									color: #94a3b8;
+								"
+							>
+								© <%= year %> DoctorHub.
+								All rights reserved.
+							</p>
+						</td>
+					</tr>
+
+				</table>
+			</td>
+		</tr>
+	</table>
+</body>
+</html>

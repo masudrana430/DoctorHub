@@ -1,6 +1,8 @@
 import { UploadApiResponse } from "cloudinary";
+import httpStatus from "http-status";
 import { cloudinary } from "../../lib/cloudinary";
 import { prisma } from "../../lib/prisma";
+import { AppError } from "../../utils/AppError";
 
 const uploadProfileImage = async (buffer: Buffer, userId: string) => {
   // cloudinary.uploader.upload_stream(
@@ -57,7 +59,12 @@ const uploadProfileImage = async (buffer: Buffer, userId: string) => {
             }
 
             if (!result) {
-              return reject(new Error("No result returned from Cloudinary"));
+              return reject(
+                new AppError(
+                  httpStatus.INTERNAL_SERVER_ERROR,
+                  "No result returned from Cloudinary",
+                ),
+              );
             }
 
             resolve(result);
@@ -89,7 +96,7 @@ const uploadProfileImage = async (buffer: Buffer, userId: string) => {
   console.log(updatedUser);
 
   if (currentUser?.imagePublicId && currentUser.imageUrl) {
-    await cloudinary.uploader.destroy(currentUser.imagePublicId)
+    await cloudinary.uploader.destroy(currentUser.imagePublicId);
   }
 
   return updatedUser;

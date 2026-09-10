@@ -1,5 +1,6 @@
 import app from "./app";
 import config from "./app/config";
+import { deleteUnverifiedDoctors } from "./app/lib/cron";
 import { transporter } from "./app/lib/nodeMailer";
 import { prisma } from "./app/lib/prisma";
 import { redisClient } from "./app/lib/redis";
@@ -22,6 +23,8 @@ const main = async () => {
 		await seedSuperAdmin();
 		await seedTesterAdmin();
 		await seedTesterDoctor();
+
+		await deleteUnverifiedDoctors();
 
 
 		console.log("Connected to the database successfully.");
