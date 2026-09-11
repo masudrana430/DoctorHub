@@ -128,7 +128,7 @@ export const seedTesterDoctor = async () => {
 
     const name = config.tester_doctor_name;
     const email = config.tester_doctor_email;
-    const password = config.tester_admin_password;
+    const password = config.tester_doctor_password;
 
     if (!name || !email || !password) {
       throw new AppError(
