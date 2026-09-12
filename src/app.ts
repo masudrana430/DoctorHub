@@ -16,7 +16,6 @@ import { notFound } from "./app/middleware/notFound";
 import { AuthRoutes } from "./app/module/auth/auth.route";
 
 import { UserRoutes } from "./app/module/user/user.route";
-import { getBkashIdToken } from "./app/lib/bkash";
 import { AppointementRoutes } from "./app/module/appointment/appointment.route";
 import { DoctorRoutes } from "./app/module/doctor/doctor.route";
 import { ScheduleRoutes } from "./app/module/schedule/schedule.route";
@@ -35,7 +34,7 @@ app.use(
   }),
 );
 
-// Enable URL-encoded form data parsing
+// Enable URL-encoded form data parsing (required for aamarPay POST callbacks)
 app.use(express.urlencoded({ extended: true }));
 
 // Middleware to parse JSON bodies
@@ -53,25 +52,16 @@ app.use("/api/v1/payment", PaymentRoutes);
 app.use("/api/v1/prescription", PrescriptionRoutes);
 app.use("/api/v1/analytics", AnalyticsRoutes);
 
-
-app.get("/test", async (req: Request, res: Response, next : NextFunction) => {
-
-	try {
-
-		const grantIdTokenResult = await getBkashIdToken()
-
-		console.log(grantIdTokenResult);
-		
-		res.status(httpStatus.OK).json({
-			success: true,
-			message: "Welcome to PH Healthcare System Backend",
-			data : null
-		});
-	} catch (error) {
-		console.log(error);
-		next(error)
-	}
-})
+app.get("/test", async (req: Request, res: Response) => {
+	res.status(httpStatus.OK).json({
+		success: true,
+		message: "DoctorHub API is running",
+		data: {
+			paymentGateway: "aamarPay",
+			environment: config.node_env,
+		},
+	});
+});
 
 // Basic route
 app.get("/", async (req: Request, res: Response) => {
