@@ -24,8 +24,8 @@ router.post(
 	AppointmentController.cancelAppointment,
 );
 
-//book appointment callback url
-router.get(
+// aamarPay sends success/failure/cancel callbacks as POST form data.
+router.post(
 	"/book-appointment/payment/callback",
 	AppointmentController.bookAppointmentCallback,
 );
