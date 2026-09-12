@@ -46,4 +46,13 @@ export default {
   aamarpay_store_id: process.env.AAMARPAY_STORE_ID!,
   aamarpay_signature_key: process.env.AAMARPAY_SIGNATURE_KEY!,
   aamarpay_callback_url: process.env.AAMARPAY_CALLBACK_URL!,
+
+  // Legacy keys kept only because the original service file is intentionally left
+  // unchanged. The active appointment controller uses the aamarPay service instead.
+  bkash_base_url: process.env.BKASH_BASE_URL!,
+  bkash_username: process.env.BKASH_USERNAME!,
+  bkash_password: process.env.BKASH_PASSWORD!,
+  bkash_app_key: process.env.BKASH_APP_KEY!,
+  bkash_app_secret: process.env.BKASH_APP_SECRET!,
+  bkash_callback_url: process.env.BKASH_CALLBACK_URL!,
 };
