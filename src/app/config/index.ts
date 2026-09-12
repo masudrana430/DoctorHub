@@ -42,10 +42,8 @@ export default {
   smtp_user: process.env.SMTP_USER!,
   smtp_password: process.env.SMTP_PASSWORD!,
 
-  bkash_base_url : process.env.BKASH_BASE_URL!,
-	bkash_username : process.env.BKASH_USERNAME!,
-	bkash_password : process.env.BKASH_PASSWORD!,
-	bkash_app_key : process.env.BKASH_APP_KEY!,
-	bkash_app_secret : process.env.BKASH_APP_SECRET!,
-	bkash_callback_url: process.env.BKASH_CALLBACK_URL!,
+  aamarpay_base_url: process.env.AAMARPAY_BASE_URL!,
+  aamarpay_store_id: process.env.AAMARPAY_STORE_ID!,
+  aamarpay_signature_key: process.env.AAMARPAY_SIGNATURE_KEY!,
+  aamarpay_callback_url: process.env.AAMARPAY_CALLBACK_URL!,
 };
