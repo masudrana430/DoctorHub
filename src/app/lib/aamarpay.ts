@@ -16,22 +16,6 @@ interface IAamarPayCreatePaymentPayload {
   appointmentId: string;
 }
 
-export interface IAamarPayTransaction {
-  pg_txnid?: string;
-  mer_txnid?: string;
-  bank_trxid?: string;
-  bank_txn?: string;
-  amount?: string | number;
-  amount_bdt?: string | number;
-  pay_status?: string;
-  status_code?: string | number;
-  date_processed?: string;
-  pay_time?: string;
-  currency?: string;
-  store_id?: string;
-  [key: string]: unknown;
-}
-
 const getBaseUrl = () => config.aamarpay_base_url.replace(/\/$/, "");
 
 export const createAamarPayTransactionId = () =>
@@ -72,20 +56,18 @@ export const initiateAamarPayPayment = async (
     }),
   });
 
-  const result = await response.json();
+  const result: any = await response.json();
 
   if (!response.ok || result?.result !== "true" || !result?.payment_url) {
-    const gatewayMessage = result?.message || result?.result || "Unknown gateway error";
+    const gatewayMessage =
+      result?.message || result?.result || "Unknown gateway error";
     throw new AppError(
       httpStatus.BAD_GATEWAY,
       `aamarPay payment initiation failed: ${gatewayMessage}`,
     );
   }
 
-  return result as Record<string, unknown> & {
-    result: "true";
-    payment_url: string;
-  };
+  return result;
 };
 
 export const verifyAamarPayTransaction = async (transactionId: string) => {
@@ -102,7 +84,7 @@ export const verifyAamarPayTransaction = async (transactionId: string) => {
     },
   });
 
-  const result = (await response.json()) as IAamarPayTransaction;
+  const result: any = await response.json();
 
   if (!response.ok) {
     throw new AppError(
